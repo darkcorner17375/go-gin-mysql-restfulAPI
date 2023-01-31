@@ -7,15 +7,20 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
+var log = logrus.New()
+
 func init() {
-	//
-	log.SetLevel(log.TraceLevel)
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Error("Error loading .env file")
+	_ = godotenv.Load(".env")
+	switch os.Getenv("GIN_MODE") {
+	case "release":
+		gin.SetMode(gin.ReleaseMode)
+	case "debug":
+		gin.SetMode(gin.DebugMode)
+	default:
+		gin.SetMode(gin.DebugMode)
 	}
 
 }
@@ -36,8 +41,6 @@ func main() {
 		AllowMethods:    []string{"GET", "POST"},
 		AllowHeaders:    []string{"Origin", "Authorization", "Content-Type", "Access-Control-Allow-Origin"},
 	}))
-
-	log.WithFields(log.Fields{"animal": "walrus"}).Info("A walrus appears")
 
 	if os.Getenv("PORT") != "" || os.Getenv("HOST") != "" {
 		port := os.Getenv("PORT")
