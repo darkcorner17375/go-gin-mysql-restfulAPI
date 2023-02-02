@@ -4,13 +4,18 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/darkcorner17375/go-gin-mysql-restfulAPI/config"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
-var log = logrus.New()
+var (
+	db  *gorm.DB = config.InitGorm()
+	log          = logrus.New()
+)
 
 func init() {
 	_ = godotenv.Load(".env")
@@ -22,10 +27,13 @@ func init() {
 	default:
 		gin.SetMode(gin.DebugMode)
 	}
+	config.InitConfig()
 
 }
 
 func main() {
+
+	defer config.CloseDatabaseConnection(db)
 
 	//新增gin引擎
 	router := gin.Default()
